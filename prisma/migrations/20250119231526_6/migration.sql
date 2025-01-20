@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Routes" ALTER COLUMN "title" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "lastName" DROP DEFAULT,
+ALTER COLUMN "secondName" DROP DEFAULT,
+ALTER COLUMN "surName" DROP DEFAULT;
