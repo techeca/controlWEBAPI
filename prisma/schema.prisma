@@ -30,9 +30,9 @@ model User {
   email       String?   @unique
   rut         String   @unique 
   name        String
-  secondName  String
+  secondName  String?
   lastName    String
-  surName     String
+  surName     String?
   controles   Control[]
   type        UserType
   password    String
