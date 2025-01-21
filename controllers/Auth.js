@@ -88,7 +88,7 @@ async function authenticateUser(rut, password) {
                 items: [
                   {
                     title: "Entrada",
-                    url: "#",
+                    url: "entrada",
                   },
                   {
                     title: "Salida",
