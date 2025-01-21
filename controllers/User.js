@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 export async function CreateUser(req, res, next) {
     const prisma = new PrismaClient();
     try {
-        const { correo, rut, nombre, tipo, contrasena, apellido } = req.body;
+        const { correo, rut, nombre, tipo, contrasena, apellido, segundoApellido, segundoNombre, cargo } = req.body;
         if (!correo || !rut || !nombre || !tipo || !contrasena || !apellido) return next(new Error("Error al obtener datos de usuario"))
         const userExist = await FindUserByRUT(rut, false);
         //Si encuentra un usuario envía 409 y error: 'Usuario ya registrado'   
@@ -17,7 +17,10 @@ export async function CreateUser(req, res, next) {
             name: nombre,
             password: hashedPassword, // Guardar la contraseña hasheada
             type: tipo,
-            lastName: apellido
+            lastName: apellido,
+            lastName: segundoApellido,
+            surName: segundoNombre,
+            cargo: cargo
         };
 
         //Registra nuevo usuario, envía 200 y result: user

@@ -36,6 +36,7 @@ model User {
   controles   Control[]
   type        UserType
   password    String
+  cargo       String
 }
 
 enum RouteType {
