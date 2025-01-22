@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv'
 import userRouter from './routes/User.js';
 import authRouter from './routes/Auth.js';
+import { handleError } from './middlewares/ErrorHandler.js';
 
 dotenv.config()
 const app = express();
@@ -45,7 +46,7 @@ export async function startServer() {
         setupRoutes();
 
         //Middleware para manejo de errores
-        //app.use(ErrorHandler);
+        app.use(handleError);
 
         app.listen(PORT, () => {
             console.info(`Server is running on http://localhost:${PORT} ${"\x1b[32m"}ON${"\x1b[0m"}`);
