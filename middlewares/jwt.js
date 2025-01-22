@@ -26,11 +26,3 @@ export function authenticateToken(req, res, next) {
         return res.status(500).json({ message: 'Error al intentar autenticación'})
     }  
 }
-
-// Middleware de autorización
-export function authorizeRole(role) {
-    return (req, res, next) => {
-        if (!req.user || req.user.role !== role) { return res.status(403).json({ message: 'No tienes permiso para acceder a este recurso' }) }
-        next();
-    };
-}

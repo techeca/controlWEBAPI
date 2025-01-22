@@ -35,7 +35,7 @@ export async function userSignIn(req, res) {
         res.status(200).json({
             message: 'Inicio de sesión exitoso',
             token,
-            user: { id: user.id, name: user.name, type: user.type, email: user.email, rut: user.rut },
+            user: user,
             routes: routes
         });
     } catch (error) {
