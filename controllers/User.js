@@ -5,7 +5,7 @@ export async function CreateUser(req, res, next) {
     const prisma = new PrismaClient();
     try {
         const { correo, rut, nombre, tipo, contrasena, apellido, segundoApellido, segundoNombre, cargo } = req.body;
-        if (!correo || !rut || !nombre || !tipo || !contrasena || !apellido) return next(new Error("Error al obtener datos de usuario"))
+        if (!correo || !rut || !nombre || !tipo || !contrasena || !apellido || !segundoApellido) return next(new Error("Error al obtener datos de usuario"))
         const userExist = await FindUserByRUT(rut, false);
         //Si encuentra un usuario envía 409 y error: 'Usuario ya registrado'   
         if (userExist) { return next({ status: 409, message: "Usuario ya registrado" }) }
@@ -58,6 +58,45 @@ export async function DeleteUser(req, res, next){
         res.status(200).json({ message: "Usuario eliminado"})
     } catch (error) {
         next({ status: 500, message: "Error al eliminar el usuario", details: error.message})
+    }
+}
+
+export async function UpdateUser(req, res, next){
+    const prisma = new PrismaClient();
+    const { rut } = req.params;
+    const { correo, nombre, tipo, contrasena, apellido, segundoApellido, cargo, segundoNombre, password } = req.body;
+    try {
+        const dataToUpdate = {
+            email: correo,
+            name: nombre,
+            type: tipo,
+            password: contrasena,
+            lastName: apellido,
+            surName: segundoApellido,
+            secondName: segundoNombre,
+            cargo: cargo,
+            password: contrasena
+        };
+
+        // Eliminar las claves con valores undefined
+        const filteredData = Object.fromEntries(
+            Object.entries(dataToUpdate).filter(([_, value]) => value !== undefined)
+        );
+
+        if (Object.keys(filteredData).length === 0) {
+            return res.status(400).json({ message: "No se proporcionaron datos para actualizar" });
+        }
+
+        await prisma.user.update({
+            where: { rut: rut },
+            data: filteredData
+        });
+
+        res.status(200).json({ message: "Usuario actualizado"})
+    } catch (error) {
+        next({ status: 500, message: "Error al intentar actualizar el usuario", details: error.message })
+    } finally {
+        prisma.$disconnect()
     }
 }
 
