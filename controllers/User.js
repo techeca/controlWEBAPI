@@ -64,7 +64,7 @@ export async function DeleteUser(req, res, next){
 export async function UpdateUser(req, res, next){
     const prisma = new PrismaClient();
     const { rut } = req.params;
-    const { correo, nombre, tipo, contrasena, apellido, segundoApellido, cargo, segundoNombre, password } = req.body;
+    const { correo, nombre, tipo, contrasena, apellido, segundoApellido, cargo, segundoNombre } = req.body;
     try {
         const dataToUpdate = {
             email: correo,
@@ -80,8 +80,14 @@ export async function UpdateUser(req, res, next){
 
         // Eliminar las claves con valores undefined
         const filteredData = Object.fromEntries(
-            Object.entries(dataToUpdate).filter(([_, value]) => value !== undefined)
+            Object.entries(dataToUpdate).filter(([_, value]) => value !== undefined && value !== "")
         );
+
+        if(filteredData.password){
+            filteredData.password = await bcrypt.hash(contrasena, 10)
+        }
+
+        console.log(filteredData);
 
         if (Object.keys(filteredData).length === 0) {
             return res.status(400).json({ message: "No se proporcionaron datos para actualizar" });

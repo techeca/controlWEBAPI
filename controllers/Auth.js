@@ -63,9 +63,10 @@ async function authenticateUser(rut, password) {
         // Retorna el usuario autenticado sin la contraseña
         const { password: _, ...userWithoutPassword } = user;
         let routes
+        let formattedRoutes
 
         if (user.type === 'USER') {
-            routes = await prisma.routes.findFirst({
+            routes = await prisma.routes.findMany({
                 where: { type: 'USER' }
             })
         } else if (user.type === 'ADMIN') {
@@ -73,7 +74,7 @@ async function authenticateUser(rut, password) {
         }
 
         // Transformar las rutas en el formato requerido
-        const formattedRoutes = routes.map(route => ({
+        formattedRoutes = routes.map(route => ({
             title: route.title,
             url: route.path,  // Asumo que el URL es una referencia como ejemplo
         }));
