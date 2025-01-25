@@ -25,7 +25,7 @@ export async function CreateUser(req, res, next) {
 
         //Registra nuevo usuario, envía 200 y result: user
         const newUser = await prisma.user.create({ data: newUserData })
-        res.status(200).json({ result: newUser })
+        res.status(201).json({ result: newUser })
     } catch (error) {
         next({ status: 500, message: "Error interno al crear el usuario", details: error.message });
     } finally {
@@ -74,8 +74,7 @@ export async function UpdateUser(req, res, next){
             lastName: apellido,
             surName: segundoApellido,
             secondName: segundoNombre,
-            cargo: cargo,
-            password: contrasena
+            cargo: cargo
         };
 
         // Eliminar las claves con valores undefined
@@ -119,7 +118,7 @@ export async function GetAllUsers(req, res, next){
 }
 
 async function FindUserByRUT(rut, withControls) {
-    if (!rut) throw new Error("Error al obtener la ip del usuario")
+    if (!rut) throw new Error("Error al obtener el rut del usuario")
     const prisma = new PrismaClient()
     try {
         const user = await prisma.user.findFirst({

@@ -48,7 +48,13 @@ async function authenticateUser(rut, password) {
     try {
         // Buscar el usuario por rut
         const user = await prisma.user.findFirst({
-            where: { rut: rut }
+            where: { rut: rut },
+            include: {
+                controles: {
+                    take: -10, // Obtiene los últimos 10 controles
+                    orderBy: { createdAt: 'desc' }, // Ordena por fecha descendente
+                },
+            },
         })
 
         // Si el usuario no existe, retorna null
@@ -81,30 +87,30 @@ async function authenticateUser(rut, password) {
 
         const dataNav = {
             items: [
-              {
-                title: "Reloj Control",
-                url: "#",
-                icon: 'Clock9',
-                isActive: true,
-                items: [
-                  {
-                    title: "Entrada",
-                    url: "entrada",
-                  },
-                  {
-                    title: "Salida",
+                {
+                    title: "Reloj Control",
                     url: "#",
-                  }
-                ],
-              },
-              user?.type === 'ADMIN' && {
-                title: "Administración",
-                url: "#",
-                icon: 'MonitorCog',
-                items: formattedRoutes
-              }
+                    icon: 'Clock9',
+                    isActive: true,
+                    items: [
+                        {
+                            title: "Entrada",
+                            url: "entrada",
+                        },
+                        {
+                            title: "Salida",
+                            url: "#",
+                        }
+                    ],
+                },
+                user?.type === 'ADMIN' && {
+                    title: "Administración",
+                    url: "#",
+                    icon: 'MonitorCog',
+                    items: formattedRoutes
+                }
             ],
-          }
+        }
 
         return { user: userWithoutPassword, routes: dataNav };
     } catch (error) {
