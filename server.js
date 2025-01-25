@@ -1,9 +1,10 @@
 import express from 'express'
 import cors from 'cors';
 import dotenv from 'dotenv'
+import { handleError } from './middlewares/ErrorHandler.js';
 import userRouter from './routes/User.js';
 import authRouter from './routes/Auth.js';
-import { handleError } from './middlewares/ErrorHandler.js';
+import controlRouter from './routes/Control.js';
 
 dotenv.config()
 const app = express();
@@ -22,6 +23,7 @@ function setupRoutes() {
     //app.use('/purchase', PurchaseRouter)
     app.use('/user', userRouter)
     app.use('/auth', authRouter)
+    app.use('/control', controlRouter)
 }
 
 //Inicio
