@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from "@prisma/client";
+import { ROLES } from '../utils/contants.js';
 
 export async function userSignIn(req, res) {
     const { rut, password } = req.body;
@@ -85,31 +86,35 @@ async function authenticateUser(rut, password) {
             url: route.path,  // Asumo que el URL es una referencia como ejemplo
         }));
 
-        const dataNav = {
+        let dataNav = {
             items: [
                 {
                     title: "Reloj Control",
-                    url: "#",
+                    url: "relojControl",
                     icon: 'Clock9',
                     isActive: true,
                     items: [
                         {
-                            title: "Entrada",
+                            title: "Marcar",
                             url: "entrada",
                         },
                         {
-                            title: "Salida",
-                            url: "#",
+                            title: "Historial",
+                            url: "historial",
                         }
                     ],
-                },
-                user?.type === 'ADMIN' && {
-                    title: "Administración",
-                    url: "#",
-                    icon: 'MonitorCog',
-                    items: formattedRoutes
                 }
             ],
+        }
+
+        if(user.type === ROLES.ADMIN){
+            const adminRoutes = {
+                title: "Administración",
+                url: "#",
+                icon: 'MonitorCog',
+                items: formattedRoutes
+            }
+            dataNav.items.push(adminRoutes); 
         }
 
         return { user: userWithoutPassword, routes: dataNav };
