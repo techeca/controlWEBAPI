@@ -57,3 +57,14 @@ model Routes {
   title   String
 }
 
+enum HolidaysType {
+  PERMANENTE
+  TRANSITORIO
+}
+
+model Holidays {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  description String?
+  type        HolidaysType
+}
