@@ -185,7 +185,9 @@ export async function GetAllControls(req, res, next) {
 export async function GetControls(req, res, next) {
     const prisma = new PrismaClient();
     try {
-        const { userId } = req.user;
+        const user = req.user;
+        if(!user) return res.status(401).json({ message: "No se proporcionó el usuario" });
+        const { userId } = user;
         const { page = 1, pageSize = 10 } = req.query;
 
         // Convertimos los valores a números para evitar errores

@@ -28,7 +28,7 @@ export async function userSignIn(req, res) {
             httpOnly: true,
             secure: process.env.MODE,
             sameSite: 'strict',
-            path: '/auth',
+            path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
         })
 
@@ -90,7 +90,7 @@ async function authenticateUser(rut, password) {
             items: [
                 {
                     title: "Reloj Control",
-                    url: "relojControl",
+                    url: "#",
                     icon: 'Clock9',
                     isActive: true,
                     items: [
@@ -127,7 +127,7 @@ async function authenticateUser(rut, password) {
 }
 
 export const refreshToken = async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
         return res.status(401).json({ message: 'Refresh token no proporcionado' });
@@ -168,14 +168,114 @@ export const refreshToken = async (req, res) => {
             httpOnly: true,
             secure: process.env.MODE === 'production',
             sameSite: 'strict',
+            path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
         });
 
         // Responder con el nuevo Access Token
-        res.json({ accessToken });
+        res.json({ token:accessToken });
     } catch (err) {
         console.error("Error al procesar el Refresh Token:", err);
         return res.status(403).json({ message: 'Token inválido o expirado' });
     }
 };
+
+export async function validateToken(req, res, next){
+    const authorizationHeader = req.headers.authorization;
+
+    // Verifica si se envió el token en el encabezado
+    if (!authorizationHeader) {
+        return res.status(401).json({ message: "No se proporcionó un token" });
+    }
+
+    const SECRET_T = process.env.JWT_SECRET
+    const token = authorizationHeader.split(" ")[1]; // Extrae el token del encabezado
+
+    try {
+        // Verifica el token usando la clave secreta
+        const decoded = jwt.verify(token, SECRET_T);
+
+        // Opcional: Puedes buscar al usuario en la base de datos si necesitas enviar más información
+        /*
+        const prisma = new PrismaClient();
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.userId },
+        });
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        */
+
+        const prisma = new PrismaClient();
+        // Buscar el usuario por rut
+        const user = await prisma.user.findFirst({
+            where: { id: decoded.userId },
+            include: {
+                controles: {
+                    take: -10, // Obtiene los últimos 10 controles
+                    orderBy: { createdAt: 'desc' }, // Ordena por fecha descendente
+                },
+            },
+        })
+
+        let routes
+        let formattedRoutes
+
+        if (user.type === 'USER') {
+            routes = await prisma.routes.findMany({
+                where: { type: 'USER' }
+            })
+        } else if (user.type === 'ADMIN') {
+            routes = await prisma.routes.findMany()
+        }
+
+        // Transformar las rutas en el formato requerido
+        formattedRoutes = routes.map(route => ({
+            title: route.title,
+            url: route.path,  // Asumo que el URL es una referencia como ejemplo
+        }));
+
+        let dataNav = {
+            items: [
+                {
+                    title: "Reloj Control",
+                    url: "#",
+                    icon: 'Clock9',
+                    isActive: true,
+                    items: [
+                        {
+                            title: "Marcar",
+                            url: "entrada",
+                        },
+                        {
+                            title: "Historial",
+                            url: "historial",
+                        }
+                    ],
+                }
+            ],
+        }
+
+        if(user.type === ROLES.ADMIN){
+            const adminRoutes = {
+                title: "Administración",
+                url: "#",
+                icon: 'MonitorCog',
+                items: formattedRoutes
+            }
+            dataNav.items.push(adminRoutes); 
+        }
+
+        
+        // Si el token es válido, responde con el usuario o información básica
+        res.status(200).json({
+            message: "Token válido",
+            user: user, // Opcionalmente, incluye más datos
+            routes: dataNav
+        });
+    } catch (error) {
+        // Maneja errores si el token no es válido o ha expirado
+        res.status(401).json({ message: "Token inválido o expirado" });
+    }    
+}
 
