@@ -64,7 +64,23 @@ enum HolidaysType {
 
 model Holidays {
   id          Int      @id @default(autoincrement())
-  date        DateTime
+  date        String
   description String?
   type        HolidaysType
+}
+
+enum DayType {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+model Days {
+  id          Int     @id @default(autoincrement())
+  Day         DayType
+  isExcluded  Boolean
 }

@@ -5,6 +5,7 @@ import { handleError } from './middlewares/ErrorHandler.js';
 import userRouter from './routes/User.js';
 import authRouter from './routes/Auth.js';
 import controlRouter from './routes/Control.js';
+import configRouter from './routes/Config.js';
 
 dotenv.config()
 const app = express();
@@ -24,6 +25,7 @@ function setupRoutes() {
     app.use('/user', userRouter)
     app.use('/auth', authRouter)
     app.use('/control', controlRouter)
+    app.use('/config', configRouter)
 }
 
 //Inicio
