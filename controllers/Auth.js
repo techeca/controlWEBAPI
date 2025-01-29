@@ -176,7 +176,8 @@ export const refreshToken = async (req, res) => {
         res.json({ token:accessToken });
     } catch (err) {
         console.error("Error al procesar el Refresh Token:", err);
-        return res.status(403).json({ message: 'Token inválido o expirado' });
+        next({ status: 403, message: "Token inválido o expirado", details: err.message })
+        //return res.status(403).json({ message: 'Token inválido o expirado' });
     }
 };
 
